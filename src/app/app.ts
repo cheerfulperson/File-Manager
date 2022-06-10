@@ -1,33 +1,46 @@
-import { Args } from '../models/arg.model';
+import OperationsManager from '../modules/operations-manager';
+import UserStream from '../modules/user-stream';
 
 class App {
+  public userStream: UserStream;
+
+  public operationManager: OperationsManager;
+
+  public isClosed = false;
+
+  constructor() {
+    this.userStream = new UserStream();
+    this.operationManager = new OperationsManager();
+  }
+
   public start(): void {
     console.log(
-      `Welcome to the File Manager, ${this.getArgByName('username').value}!`,
+      `Welcome to the File Manager, ${this.userStream.userName}!`,
+      '\n Print commands and wait for results:',
     );
+
+    this.processData();
+    this.handleAppExit();
   }
 
-  private getArgByName(name: string): Args {
-    return (
-      this.getArgs().find((value: Args) => value.name === name) || {
-        name: 'username',
-        value: 'username',
-      }
-    );
+  private processData(): void {
+    process.stdout.write('>');
+    process.stdin.once('data', (data) => {
+      this.operationManager.define(data);
+      if (!this.isClosed) this.processData();
+    });
   }
 
-  private getArgs(): Args[] {
-    const userInputsArgs = process.argv.slice(2);
-    return userInputsArgs.reduce<Args[]>((acc, arg) => {
-      const argValue: string[] = arg.split('=');
-      if (argValue[1] && arg.startsWith('--')) {
-        acc.push({
-          name: argValue[0].slice(2),
-          value: argValue[1],
-        });
-      }
-      return acc;
-    }, []);
+  private handleAppExit(): void {
+    process.on('SIGINT', () => {
+      process.exit(0);
+    });
+    process.on('exit', () => {
+      this.isClosed = true;
+      console.log(
+        `Thank you for using File Manager, ${this.userStream.userName}!`,
+      );
+    });
   }
 }
 
