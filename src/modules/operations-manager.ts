@@ -11,8 +11,13 @@ class OperationsManager {
     this.userStream = new UserStream();
   }
 
-  public define(data: string | Buffer): void {
-    const event = data.toString('utf-8').trim();
+  get currentDirectory(): string {
+    return this.oparations.directory;
+  }
+
+  public async define(data: string | Buffer): Promise<void> {
+    const inputData = data.toString('utf-8').trim().split(' ');
+    const event = inputData[0];
 
     if (event === '.exit') {
       process.exit(0);
@@ -22,7 +27,12 @@ class OperationsManager {
       case 'up':
         this.oparations.up();
         break;
-
+      case 'cd':
+        await this.oparations.cd(inputData.slice(1));
+        break;
+      case 'ls':
+        await this.oparations.ls();
+        break;
       default:
         this.userStream.showError();
         break;

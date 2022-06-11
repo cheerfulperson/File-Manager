@@ -16,8 +16,12 @@ class UserStream {
     );
   }
 
-  public showError(err = 'Invalid input'): void {
-    console.log('\x1b[31m', err, '\x1b[0m');
+  public showError(err = 'Invalid input', ...errText: string[]): void {
+    console.log(' [\x1b[31merror\x1b[0m]', err, ...errText);
+  }
+
+  public showInfo(subtext: string, ...info: string[]): void {
+    console.log(subtext, ...info, '\n');
   }
 
   private getArgs(): Args[] {
