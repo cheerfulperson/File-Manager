@@ -6,7 +6,7 @@ import UserStream from './user-stream';
 class Operations {
   public directory: string = homedir();
 
-  private userStream: UserStream = new UserStream();
+  protected userStream: UserStream = new UserStream();
 
   public up(): void {
     if (this.directory === join(this.directory, '..')) {
@@ -18,7 +18,8 @@ class Operations {
   }
 
   public async cd(argv: string[]): Promise<void> {
-    const newPath = resolve(this.directory, argv[0]);
+    const newPath = resolve(this.directory, this.getFolderName(argv));
+
     try {
       const value = await stat(newPath);
       if (value.isDirectory()) {
@@ -37,20 +38,31 @@ class Operations {
   public async ls(): Promise<void> {
     try {
       const filesInFolder: string[] = await readdir(this.directory);
-      console.log(filesInFolder);
-      filesInFolder.forEach(async (filePath: string) => {
-        const fileInfo = await stat(join(this.directory, filePath));
+      await Promise.allSettled(
+        filesInFolder.map(async (filePath: string) => {
+          const fileInfo = await stat(join(this.directory, filePath));
 
-        console.log(
-          `[\x1b[32m${fileInfo.isFile() ? 'file' : 'dir '}\x1b[0m]`,
-          filePath,
-          `${fileInfo.size}kb`,
-          fileInfo.birthtime,
-        );
-      });
+          console.log(
+            ` [\x1b[32m${fileInfo.isFile() ? 'file' : 'dir '}\x1b[0m]`,
+            filePath,
+            `${fileInfo.size}kb`,
+            fileInfo.birthtime,
+          );
+        }),
+      );
     } catch (error) {
       this.userStream.showError('Operation failed:');
     }
+  }
+
+  private getFolderName(argv: string[]): string {
+    return argv.length < 2
+      ? argv[0]
+      : argv
+          .join(' ')
+          .split('')
+          .filter((char: string) => char !== "'" && char !== '"')
+          .join('');
   }
 }
 
