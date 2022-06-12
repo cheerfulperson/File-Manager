@@ -4,7 +4,7 @@ import {
     CpuInfo,
     homedir,
     arch,
-    userInfo
+    userInfo,
 } from 'os';
 import FilesOperations from './files-operations';
 

@@ -51,11 +51,11 @@ class Operations {
         }),
       );
     } catch (error) {
-      this.userStream.showError('Operation failed:');
+      this.userStream.showError('Operation failed');
     }
   }
 
-  private getFolderName(argv: string[]): string {
+  protected getFolderName(argv: string[]): string {
     return argv.length < 2
       ? argv[0]
       : argv

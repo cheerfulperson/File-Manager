@@ -37,6 +37,24 @@ class OperationsManager {
       case 'os':
         await this.oparations.os(argv);
         break;
+      case 'cat':
+        await this.oparations.readFile(argv);
+        break;
+      case 'add':
+        await this.oparations.addFile(argv);
+        break;
+      case 'rn':
+        await this.oparations.renameFile(argv);
+        break;
+      case 'cp':
+        await this.oparations.copyFile(argv);
+        break;
+      case 'mv':
+        await this.oparations.copyFile(argv, true);
+        break;
+      case 'rm':
+        await this.oparations.removeFile(argv, true);
+        break;
       default:
         this.userStream.showError();
         break;
