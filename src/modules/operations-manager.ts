@@ -18,7 +18,7 @@ class OperationsManager {
   public async define(data: string | Buffer): Promise<void> {
     const inputData = data.toString('utf-8').trim().split(' ');
     const event = inputData[0];
-    const argv = inputData.slice(1);
+    const argv = inputData.slice(1) || [''];
 
     if (event === '.exit') {
       process.exit(0);
@@ -54,6 +54,15 @@ class OperationsManager {
         break;
       case 'rm':
         await this.oparations.removeFile(argv, true);
+        break;
+      case 'hash':
+        await this.oparations.printHash(argv);
+        break;
+      case 'compress':
+        await this.oparations.compress(argv);
+        break;
+      case 'decompress':
+        await this.oparations.decompress(argv);
         break;
       default:
         this.userStream.showError();

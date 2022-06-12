@@ -46,7 +46,7 @@ class App {
     process.on('exit', () => {
       this.isClosed = true;
       console.log(
-        `Thank you for using File Manager, ${this.userStream.userName}!`,
+        `\nThank you for using File Manager, ${this.userStream.userName}!\n`,
       );
     });
   }

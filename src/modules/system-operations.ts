@@ -14,6 +14,10 @@ class SystemOperations extends FilesOperations {
   }
 
   public async os(argv: string[]): Promise<void> {
+    if (argv.length === 0) {
+      this.userStream.showError('Operation failed');
+    }
+
     argv.forEach((arg: string) => {
       const argName: string | null = arg.startsWith('--') ? arg.slice(2) : null;
 

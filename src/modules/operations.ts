@@ -57,7 +57,7 @@ class Operations {
 
   protected getFolderName(argv: string[]): string {
     return argv.length < 2
-      ? argv[0]
+      ? argv[0] || ''
       : argv
           .join(' ')
           .split('')
