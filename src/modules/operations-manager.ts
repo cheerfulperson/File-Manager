@@ -24,49 +24,53 @@ class OperationsManager {
       process.exit(0);
     }
 
-    switch (event) {
-      case 'up':
-        this.oparations.up();
-        break;
-      case 'cd':
-        await this.oparations.cd(argv);
-        break;
-      case 'ls':
-        await this.oparations.ls();
-        break;
-      case 'os':
-        await this.oparations.os(argv);
-        break;
-      case 'cat':
-        await this.oparations.readFile(argv);
-        break;
-      case 'add':
-        await this.oparations.addFile(argv);
-        break;
-      case 'rn':
-        await this.oparations.renameFile(argv);
-        break;
-      case 'cp':
-        await this.oparations.copyFile(argv);
-        break;
-      case 'mv':
-        await this.oparations.copyFile(argv, true);
-        break;
-      case 'rm':
-        await this.oparations.removeFile(argv, true);
-        break;
-      case 'hash':
-        await this.oparations.printHash(argv);
-        break;
-      case 'compress':
-        await this.oparations.compress(argv);
-        break;
-      case 'decompress':
-        await this.oparations.decompress(argv);
-        break;
-      default:
-        this.userStream.showError();
-        break;
+    try {
+      switch (event) {
+        case 'up':
+          this.oparations.up();
+          break;
+        case 'cd':
+          await this.oparations.cd(argv);
+          break;
+        case 'ls':
+          await this.oparations.ls();
+          break;
+        case 'os':
+          await this.oparations.os(argv);
+          break;
+        case 'cat':
+          await this.oparations.readFile(argv);
+          break;
+        case 'add':
+          await this.oparations.addFile(argv);
+          break;
+        case 'rn':
+          await this.oparations.renameFile(argv);
+          break;
+        case 'cp':
+          await this.oparations.copyFile(argv);
+          break;
+        case 'mv':
+          await this.oparations.copyFile(argv, true);
+          break;
+        case 'rm':
+          await this.oparations.removeFile(argv, true);
+          break;
+        case 'hash':
+          await this.oparations.printHash(argv);
+          break;
+        case 'compress':
+          await this.oparations.compress(argv);
+          break;
+        case 'decompress':
+          await this.oparations.decompress(argv);
+          break;
+        default:
+          this.userStream.showError();
+          break;
+      }
+    } catch (error) {
+      //* *//
     }
   }
 }

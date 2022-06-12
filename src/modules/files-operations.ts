@@ -1,6 +1,5 @@
-import {
- readFile, writeFile, rename, copyFile, rm,
-} from 'fs/promises';
+import { rename, copyFile, rm } from 'fs/promises';
+import { createReadStream, createWriteStream } from 'fs';
 import { dirname, resolve } from 'path';
 import { createHmac } from 'crypto';
 import Operations from './operations';
@@ -13,31 +12,49 @@ class FilesOperations extends Operations {
     super();
   }
 
-  public async readFile(argv: string[]): Promise<void> {
+  public async readFile(argv: string[], hasInfo = true): Promise<string> {
     const pathToFile: string = resolve(
       this.directory,
       this.getFolderName(argv),
     );
 
-    try {
-      const fileText: string = await readFile(pathToFile, 'utf-8');
-      this.userStream.showInfo('[\x1b[36minfo\x1b[0m]\n', fileText);
-    } catch (error) {
-      this.printError(pathToFile);
-    }
+    return new Promise((res, rej) => {
+      const readStream = createReadStream(pathToFile, 'utf-8');
+      let data = '';
+      readStream.on('data', (chunk) => {
+        data += chunk.toString('utf-8');
+      });
+      readStream.on('end', () => {
+        if (hasInfo) {
+          this.userStream.showInfo('[\x1b[36minfo\x1b[0m]\n', data);
+        }
+        res(data);
+      });
+      readStream.on('error', (err) => {
+        this.printError(pathToFile);
+        rej(err);
+      });
+    });
   }
 
   public async addFile(argv: string[]): Promise<void> {
     const pathToFile = resolve(this.directory, this.getFolderName(argv));
-    try {
-      await writeFile(pathToFile, '');
-      this.userStream.showInfo(
-        '[\x1b[36minfo\x1b[0m]',
-        `An empty file was created in ${this.directory}`,
-      );
-    } catch (error) {
-      this.printError(pathToFile);
-    }
+    return new Promise((res, rej) => {
+      const writeStream = createWriteStream(pathToFile, { encoding: 'utf8' });
+      writeStream.on('close', () => {
+        this.userStream.showInfo(
+          '[\x1b[36minfo\x1b[0m]',
+          `An empty file was created in ${this.directory}`,
+        );
+        res();
+      });
+      writeStream.on('error', () => {
+        this.printError(pathToFile);
+        rej();
+      });
+      writeStream.end('');
+      writeStream.close();
+    });
   }
 
   public async renameFile(argv: string[]): Promise<void> {
@@ -93,7 +110,7 @@ class FilesOperations extends Operations {
   public async printHash(argv: string[]): Promise<void> {
     const pathToFile = resolve(this.directory, this.getFolderName(argv));
     try {
-      const fileText: string = await readFile(pathToFile, 'utf8');
+      const fileText: string = await this.readFile(argv, false);
 
       const hash = createHmac('sha256', 'secret')
         .update(fileText)
